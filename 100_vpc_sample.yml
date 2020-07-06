@@ -1,0 +1,62 @@
+# 本当は1ファイルですべてのリソースを作成するより、複数ファイルに分割しておくほうが良い
+
+AWSTemplateFormatVersion: "2010-09-09"
+
+# 設定値はパラメータで設定すると便利
+Parameters:
+  VpcCidrBlock:
+    Type: String
+    Default: "172.0.0.0/16"
+  PublicSubnet01CidrBlock:
+    Type: String
+    Default: "172.0.10.0/24"
+  PrivateSubnet01CidrBlock:
+    Type: String
+    Default: "172.0.11.0/24"
+# ---　update-stackを試す用
+#  PrivateSubnet02CidrBlock:
+#    Type: String
+#    Default: "172.0.100.0/24"
+
+# リソースの指定
+Resources:
+  VPC:
+    Type: "AWS::EC2::VPC"
+    Properties:
+      # Ref関数でパラメータを受け取る
+      CidrBlock: !Ref VpcCidrBlock
+      InstanceTenancy: "default"
+      EnableDnsSupport: "true"
+      EnableDnsHostnames: "true"
+      Tags:
+        - Key: "name"
+          Value: "CloudFormation SampleVPC"
+  PublicSubnet01:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      CidrBlock: !Ref PublicSubnet01CidrBlock
+      AvailabilityZone: "ap-northeast-1a"
+      # Ref関数で作成したVPCを指定
+      VpcId: !Ref VPC
+      Tags:
+        - Key: "name"
+          Value: "CloudFormation PublicSubnet01"
+  PrivateSubnet01:
+    Type: "AWS::EC2::Subnet"
+    Properties:
+      CidrBlock: !Ref PrivateSubnet01CidrBlock
+      AvailabilityZone: "ap-northeast-1c"
+      VpcId: !Ref VPC
+      Tags:
+        - Key: "name"
+          Value: "CloudFormation PrivateSubnet01"
+# ---　update-stackを試す用
+#  PrivateSubnet02:
+#    Type: "AWS::EC2::Subnet"
+#    Properties:
+#      CidrBlock: !Ref PrivateSubnet02CidrBlock
+#      AvailabilityZone: "ap-northeast-1d"
+#      VpcId: !Ref VPC
+#      Tags:
+#        - Key: "name"
+#          Value: "CloudFormation PrivateSubnet02"
